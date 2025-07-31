@@ -1,4 +1,4 @@
-## Ansible Collection - fbi.platform_infra
+## Ansible Collection - ado.platform_infra
 
 This collection provides roles to automate Red Hat Satellite registration and platform infrastructure tasks.
 

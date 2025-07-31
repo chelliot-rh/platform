@@ -5,7 +5,7 @@ All notable changes to this collection will be documented in this file.
 ## [4.0.0] - 2025-06-27
 
 ### Added
-- Initial release of the `fbi.platform_infra` Ansible collection ([galaxy.yml](platform_infrastructure_automation/galaxy.yml)).
+- Initial release of the `ado.platform_infra` Ansible collection ([galaxy.yml](platform_infrastructure_automation/galaxy.yml)).
 - Role: `sat_reg` for Red Hat Satellite registration ([roles/sat_reg/README.md](platform_infrastructure_automation/roles/sat_reg/README.md)).
   - Tasks for generating and executing Satellite registration commands ([roles/sat_reg/tasks/reg_to_sat.yml](platform_infrastructure_automation/roles/sat_reg/tasks/reg_to_sat.yml)).
   - Default and variable files ([roles/sat_reg/defaults/main.yml](platform_infrastructure_automation/roles/sat_reg/defaults/main.yml), [roles/sat_reg/vars/main.yml](platform_infrastructure_automation/roles/sat_reg/vars/main.yml)).
