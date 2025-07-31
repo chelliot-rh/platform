@@ -1,0 +1,46 @@
+---
+- name: Create temporary file on localhost
+  ansible.builtin.tempfile:
+    state: file
+    suffix: mail
+  register: temp_file
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: (debug) Show temp_file
+  ansible.builtin.debug:
+    var: temp_file
+    verbosity: 1
+  when: temp_file is defined
+
+- name: Template Message Body
+  ansible.builtin.template:
+    src: "post_patch_results.yaml.j2"
+    dest: "{{ temp_file.path }}"
+    mode: "0644"
+  delegate_to: localhost
+  run_once: true
+
+- name: Set email Fact When Comma Separated String
+  ansible.builtin.set_fact:
+    email2: "{{ hostvars[inventory_hostname]['email'] | split(',') | list }}"
+  when: hostvars[inventory_hostname]['email'] is string
+
+- name: Set email Fact When List
+  ansible.builtin.set_fact:
+    email2: "{{ hostvars[inventory_hostname]['email'] }}"
+  when: (hostvars[inventory_hostname]['email'] is iterable) and (hostvars[inventory_hostname]['email'] is not string) and (hostvars[inventory_hostname]['email'] is not mapping)
+
+- name: Send Patching Results to Email
+  community.general.mail:
+    host: "{{ servers['mail_relay'].keys() | first }}"
+    port: "{{ servers['mail_relay'][(servers['mail_relay'] | first)]['port'] }}"
+    secure: never
+    to: "{{ email2 }}"
+    sender: "patching@nixapps.fbi"
+    subject: "Completed Automatic Patching for Application {{ app_name | upper }} {{ prod_status | upper }}"
+    body: "{{ lookup('ansible.builtin.file', temp_file.path) }}"
+  delegate_to: localhost
+  run_once: true
+

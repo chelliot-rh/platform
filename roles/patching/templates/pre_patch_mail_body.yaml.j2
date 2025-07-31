@@ -1,0 +1,19 @@
+{% if prod_status == 'nonprod' %}
+Servers will be patched during business hours (10am Eastern) on {{ np_start_date }}.
+{% elif prod_status == 'rollingprod' %}
+Servers will be patched in a rolling fashion starting on {{ r_start_date }}.
+{% elif prod_status == 'prod' %}
+Servers will be patched during the approved downtime window (6pm Eastern) on {{ p_start_date }}.
+{% endif %}
+
+The following servers with production status {{ prod_status | upper }} will be patched.
+{% if target is defined %}
+{% for host in groups[target] %}
+{{ hostvars[host]['inventory_hostname'] }}
+{% endfor %}
+{% else %}
+{% for host in groups['all'] %}
+{{ hostvars[host]['inventory_hostname'] }}
+{% endfor %}
+{% endif %}
+Please contact patching leads Arianna Fowler or Shawn Cole if the above list of servers is incorrect, the recipient of this email needs to be updated, or if you have any additional questions.

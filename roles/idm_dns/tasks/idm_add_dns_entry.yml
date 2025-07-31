@@ -1,0 +1,14 @@
+- name: Add A record to IdM DNS using redhat.rhel_idm
+  redhat.rhel_idm.dnsrecord:
+    name: "{{ dns_record }}"
+    zone: "{{ dns_zone }}"
+    record_type: A
+    ttl: 3600
+    state: "{{ state }}"
+    data:
+      - "{{ ip_address }}"
+    ipa_host: "{{ ipa_host }}"
+    ipa_user: "{{ ipa_user }}"
+    ipa_pass: "{{ ipa_pass }}"
+    validate_certs: false
+

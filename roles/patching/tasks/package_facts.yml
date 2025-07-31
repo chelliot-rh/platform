@@ -1,0 +1,10 @@
+---
+- name: Obtain Package Update Information
+  ansible.builtin.package_facts:
+  register: yum_updates
+
+- name: (debug) Show yum_updates
+  ansible.builtin.debug:
+    var: yum_updates
+    verbosity: 1
+  when: yum_updates is defined

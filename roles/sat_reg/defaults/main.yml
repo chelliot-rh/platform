@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT-0
+---
+# defaults file for sat_reg
+
+sat_reg_validate_certs: true # Whether to validate SSL certificates when connecting to Satellite
+sat_reg_lifeycle_env: "" # The lifecycle environment to use for registration
+sat_reg_insights_enabled: false # Whether to enable Insights during registration
+sat_reg_update_packages: false # Whether to update packages during registration
+sat_reg_insecure: false

@@ -1,0 +1,7 @@
+- name: Add IDM Replica entry
+  ansible.builtin.import_tasks: install-idm-replica.yml
+  when: state == "present"
+
+- name: Remove IDM Replica entry
+  ansible.builtin.import_tasks: remove-idm-replica.yml
+  when: state == "absent"

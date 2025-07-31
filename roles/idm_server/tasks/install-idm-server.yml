@@ -1,0 +1,4 @@
+- name: Install IDM server
+  redhat.rhel_idm.ipaserver:
+    state: "{{ state }}"
+    name: "{{ ipaserver }}"

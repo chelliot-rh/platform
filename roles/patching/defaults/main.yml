@@ -1,0 +1,17 @@
+---
+# defaults file for patching
+
+# Configure whether to check server mountpoints.
+patching_check_mountpoints: true
+
+# Configure whether to not restart servers.
+patching_do_not_restart: false
+
+# Configure whether to force restart servers.
+patching_force_restart: false
+
+# Configure whether to update the BigFix client.
+patching_update_bigfix: true
+
+# Configure whether to clean up old kernels from /boot.
+patching_package_cleanup: false

@@ -1,0 +1,47 @@
+---
+- name: Set Group List
+  ansible.builtin.set_fact:
+    groups_list: []
+  run_once: true
+
+- name: Create Inventory Dictionary
+  ansible.builtin.set_fact:
+    groups_dict: >-
+      {{
+        groups_dict | default({}) | combine({
+          hostvars[item].group_names[0]: {
+            'servers': (groups_dict[hostvars[item].group_names[0]].servers | default([]) + [item]) | unique,
+            'email': hostvars[item].email,
+            'start_time': hostvars[item].start_time
+          }
+        })
+      }}
+  loop: "{{ ansible_play_hosts_all }}"
+  run_once: true
+
+- name: Populate Group List
+  ansible.builtin.set_fact:
+    groups_list: "{{ groups_list + [{'group': hostvars[item].group_names[0], 'server': item }] }}"
+  loop: "{{ ansible_play_hosts_all }}"
+  run_once: true
+
+- name: Send Patching Email
+  community.general.mail:
+    host: "{{ servers['mail_relay'].keys() | first }}"
+    port: "{{ servers['mail_relay'][(servers['mail_relay'] | first)]['port'] }}"
+    secure: never
+    to: "{{ item.value.email }}"
+    sender: "testemail@nixapps.fbi"
+    subject: "Scheduled Patching for {{ item.key }}"
+    body: |
+      The following servers will be patched on{% if target == 'nonprod' %} {{ np_start_date }} at {{ item.value.start_time }} EST: {% elif target == 'prod' %} {{ p_start_date }} at {{ item.value.start_time }} EST: {% endif %}
+
+
+      {% for server in item.value.servers %}
+      {{ server }}
+      {% endfor %}
+
+      Please contact patching leads Tom Tran or Shawn Cole if the above list of servers is incorrect, the recipient of this email needs to be updated, or if you have any additional questions.
+  delegate_to: localhost
+  run_once: true
+  loop: "{{ groups_dict | dict2items }}"

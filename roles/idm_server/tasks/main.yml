@@ -1,0 +1,7 @@
+- name: Add IDM Server entry
+  ansible.builtin.import_tasks: install-idm-server.yml
+  when: state == "present"
+
+- name: Remove IDM Server entry
+  ansible.builtin.import_tasks: remove-idm-server.yml
+  when: state == "absent"

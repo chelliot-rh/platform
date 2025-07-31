@@ -1,0 +1,7 @@
+- name: Add IDM DNS entry
+  ansible.builtin.import_tasks: idm_add_dns_entry.yml
+  when: state == "present"
+
+- name: Remove IDM DNS entry
+  ansible.builtin.import_tasks: rhbk_remove_dns_entry.yml
+  when: state == "absent"

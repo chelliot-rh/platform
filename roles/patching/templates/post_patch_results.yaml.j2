@@ -1,0 +1,19 @@
+The following servers have been patched.
+{% if target is defined %}
+{% for host in groups[target] %}
+{% if hostvars[host]['yum_patch'] is changed %}
+{{ hostvars[host]['inventory_hostname'] }} - {{ hostvars[host]['yum_updates'].results | map(attribute='envra') | list | length }} updates applied, kernel={{ hostvars[host]['post_kernel'] }}
+{% else %}
+{{ hostvars[host]['inventory_hostname'] }} - No updates applied. 
+{% endif %}
+{% endfor %}
+{% else %}
+{% for host in groups['all'] %}
+{% if hostvars[host]['yum_patch'] is changed %}
+{{ hostvars[host]['inventory_hostname'] }} - {{ hostvars[host]['yum_updates'].results | map(attribute='envra') | list | length }} updates applied, kernel={{ hostvars[host]['post_kernel'] }}
+{% else %}
+{{ hostvars[host]['inventory_hostname'] }} - No updates applied. 
+{% endif %}
+{% endfor %}
+{% endif %}
+Please contact patching leads Tom Tran or Shawn Cole if the information above seems incorrect, the email recipient needs to be updated, or if you have any questions.

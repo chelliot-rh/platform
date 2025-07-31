@@ -1,0 +1,7 @@
+- name: Register IDM Client
+  ansible.builtin.import_tasks: idm_register_client.yml
+  when: state == "present"
+
+- name: Remove IDM client
+  ansible.builtin.import_tasks: rhbk_remove_client.yml
+  when: state == "absent"

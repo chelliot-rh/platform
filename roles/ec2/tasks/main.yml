@@ -1,0 +1,65 @@
+- name: start an instance and Add EBS
+  amazon.aws.ec2_instance:
+    name: "{{ instance_name }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    image_id: "{{ image_id }}"
+    vpc_subnet_id: "{{ vpc_subnet_id }}"
+    region: "{{ region }}"
+    instance_type: "{{ instance_type }}"
+    key_name: "{{ key_name }}"
+    security_group: "{{ security_group }}"
+    subnet_id: "{{ subnet_id }}"
+    volumes:
+      - device_name: "{{ volume_device_name }}"
+        ebs:
+          volume_size: "{{ volume_size }}"
+          delete_on_termination: "{{ volume_delete_on_termination }}"
+  register: newebsvolume
+
+- set_fact: instance_id="{{ newebsvolume['instances'][0]['instance_id'] }}"
+
+- name: create snapshot
+  amazon.aws.ec2_snapshot:
+    instance_id: "{{ instance_id }}"
+    device_name: "{{ volume_device_name }}"
+    description: "{{ description }}"
+    region: "{{ region }}"
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+  register: newebssnapshot
+
+- set_fact: snapshot_instance_id="{{ newebssnapshot['snapshots'][0]['snapshot_id'] }}"
+
+- name: Basic AMI Creation with instance
+  amazon.aws.ec2_ami:
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
+    instance_id: "{{ instance_id }}"
+    wait: true
+    name: "{{ new_instance_name }}"
+    region: "{{ region }}"
+    tags:
+      Name: "{{ tags }}"
+      Service: TestService
+
+# uncomment if you want to use a snapshot       
+#- name: Basic AMI Creation with snapshot
+#  amazon.aws.ec2_ami:
+#    aws_access_key: "AKIATKVFSAFZAKUEBAXV"
+#    aws_secret_key: "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"
+#    #instance_id: "{{ instance_id }}" 
+#    wait: true
+#    name: newtest2
+#    region: us-east-2
+#    root_device_name: /dev/xvda
+#    device_mapping:
+#      - device_name: /dev/xvda
+#        volume_size: 16 
+#        snapshot_id: "{{ snapshot_instance_id }}"
+#        delete_on_termination: true
+#        volume_type: gp2
+#    tags:
+#      Name: newtest
+#      Service: TestService
+

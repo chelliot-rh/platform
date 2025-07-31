@@ -1,0 +1,45 @@
+---
+- name: Create temporary file on localhost
+  ansible.builtin.tempfile:
+    state: file
+    suffix: mail
+  register: temp_file
+  delegate_to: localhost
+  run_once: true
+  become: false
+
+- name: (debug) Show temp_file
+  ansible.builtin.debug:
+    var: temp_file
+    verbosity: 1
+  when: temp_file is defined
+
+- name: Template Message Body
+  ansible.builtin.template:
+    src: "pre_patch_mail_body.yaml.j2"
+    dest: "{{ temp_file.path }}"
+    mode: "0644"
+  delegate_to: localhost
+  run_once: true
+
+- name: Set Recipient Fact When Comma Separated String
+  ansible.builtin.set_fact:
+    recipient2: "{{ recipient | split(',') | list }}"
+  when: recipient is string
+
+- name: Set Recipient Fact When List
+  ansible.builtin.set_fact:
+    recipient2: "{{ recipient }}"
+  when: (recipient is iterable) and (recipient is not string) and (recipient is not mapping)
+
+- name: Send List of Servers to Email
+  community.general.mail:
+    host: "{{ servers['mail_relay'].keys() | first }}"
+    port: "{{ servers['mail_relay'][(servers['mail_relay'] | first)]['port'] }}"
+    secure: never
+    to: "{{ recipient2 }}"
+    sender: "patching@nixapps.fbi"
+    subject: "Scheduled Automatic Patching for Application {{ app_name | upper }} {{ prod_status | upper }}"
+    body: "{{ lookup('ansible.builtin.file', temp_file.path) }}"
+  delegate_to: localhost
+  run_once: true

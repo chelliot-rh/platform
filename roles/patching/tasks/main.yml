@@ -1,0 +1,5 @@
+---
+# tasks file for patching
+
+- name: Importing registration tasks
+  ansible.builtin.import_tasks: patch.yml

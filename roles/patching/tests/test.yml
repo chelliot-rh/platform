@@ -1,0 +1,5 @@
+---
+- name: '$ROLE role integration tests'
+  hosts: localhost
+  roles:
+    - '.'

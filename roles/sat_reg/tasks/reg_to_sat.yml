@@ -1,0 +1,26 @@
+- name: Generate registration command
+  redhat.satellite.registration_command:
+    username: "{{ sat_org_admin_account }}"
+    password: "{{ sat_org_admin_account_password }}"
+    activation_keys:
+      - "{{ sat_reg_activation_key_name }}"
+    organization: "{{ sat_reg_satellite_org_name }}"
+    server_url: "{{ sat_reg_satellite_host }}"
+    force: true
+    validate_certs: "{{ sat_reg_validate_certs }}"
+    lifecycle_environment: "{{ sat_reg_lifeycle_env }}"
+    insecure: "{{ sat_reg_insecure }}"
+    # packages: <packages to install when registered>
+    # setup_remote_execution: false
+    setup_insights: "{{ sat_reg_insights_enabled }}"
+    update_packages: "{{ sat_reg_update_packages }}"
+  register: command
+
+- name: Debug
+  ansible.builtin.debug:
+    msg: "{{ command.registration_command }}"
+
+- name: Perform registration  # noqa: command-instead-of-shell Because we need to run a shell command based on the output of the previous task
+  ansible.builtin.shell: "{{ command.registration_command }}"
+  register: script_result
+  changed_when: "'changed' in script_result.stdout"
